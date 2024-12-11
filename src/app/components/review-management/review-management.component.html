@@ -1,0 +1,104 @@
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Performance Reviews</h2>
+        <button (click)="openCreateReviewModal()" 
+                class="bg-blue-500 text-white px-4 py-2 rounded">
+            Create Review
+        </button>
+    </div>
+    
+    <app-dialog
+  [isOpen]="showCreateReviewDialog"
+  title="Create Performance Review"
+  confirmText="Create"
+  (onConfirm)="submitReview()"
+  (onCancel)="showCreateReviewDialog = false">
+  
+  <form [formGroup]="reviewForm" class="text-left">
+    <!-- Employee Selection -->
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2">
+        Employee to Review
+      </label>
+      <select formControlName="employeeId" 
+              class="w-full px-3 py-2 border rounded">
+        <option value="">Select Employee</option>
+        @for(emp of employees; track $index) {
+          <option [value]="emp._id">{{emp.full_name}}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Reviewer Selection -->
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2">
+        Assign Reviewer
+      </label>
+      <select formControlName="reviewerId" 
+              class="w-full px-3 py-2 border rounded">
+        <option value="">Select Reviewer</option>
+        @for(emp of employees; track $index) {
+          @if(emp._id !== reviewForm.get('employeeId')?.value) {
+            <option [value]="emp._id">{{emp.full_name}}</option>
+          }
+        }
+      </select>
+    </div>
+
+    <!-- Period -->
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2">
+        Review Period
+      </label>
+      <input type="text" formControlName="period" 
+             class="w-full px-3 py-2 border rounded"
+             placeholder="e.g., 2024-Q1">
+    </div>
+
+    <!-- Due Date -->
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2">
+        Due Date
+      </label>
+      <input type="date" formControlName="dueDate" 
+             class="w-full px-3 py-2 border rounded">
+    </div>
+  </form>
+</app-dialog>
+
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for(review of reviews; track $index) {
+            <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <h3 class="font-bold text-lg">{{getEmployeeName(review.employeeId)}}</h3>
+                    <span class="px-2 py-1 text-sm rounded-full" 
+                          [ngClass]="review.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'">
+                        {{review.status}}
+                    </span>
+                </div>
+                <p class="text-gray-600 mt-2">Period: {{review.period}}</p>
+                <p class="text-gray-600">Due: {{review.dueDate | date:'mediumDate'}}</p>
+                @if(review.rating) {
+                    <p class="mt-2">Rating: {{review.rating}}/5</p>
+                }
+                <div class="mt-4 flex gap-2">
+                    <button (click)="assignReviewers(review.id)" 
+                            class="text-blue-500 hover:text-blue-700">
+                        Assign Reviewers
+                    </button>
+                    <button (click)="viewDetails(review.id)"
+                            class="text-gray-500 hover:text-gray-700">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        } @empty {
+            <div class="col-span-3 text-center py-8 text-gray-500">
+                No reviews found
+            </div>
+        }
+    </div>
+
+
+</div>

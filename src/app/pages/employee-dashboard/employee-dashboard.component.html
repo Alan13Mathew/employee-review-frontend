@@ -1,0 +1,100 @@
+<div class="min-h-screen bg-gray-100 p-6">
+
+
+
+    <div class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 m-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-semibold">Welcome, {{currentUser.full_name}}</h1>
+            <app-dialog
+            [isOpen]="showLogoutDialog"
+            title="Confirm Logout"
+            confirmText="Logout"
+            confirmButtonClass="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            (onConfirm)="confirmLogout()"
+            (onCancel)="showLogoutDialog = false"
+            ><p>Are you sure you want to logout?</p></app-dialog>
+            <button (click)="handleLogout()" 
+                    class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">
+                Logout
+            </button>
+        </div>
+    </div>
+    
+    
+    <div class="grid gap-6">
+        <!-- Pending Reviews Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-4">Pending Reviews</h2>
+            @for (review of pendingReviews; track review.id) {
+                <div class="border rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-semibold">Review for: {{getEmployeeName(review.employeeId)}}</h3>
+                        <span class="text-sm text-red-600">Due: {{review.dueDate | date:'mediumDate'}}</span>
+                    </div>
+                    <button 
+                        (click)="provideFeedback(review)"
+                        class="mt-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Provide Feedback
+                    </button>
+                </div>
+            } @empty {
+                <p class="text-gray-500 text-center py-4">No pending reviews</p>
+            }
+        </div>
+
+
+<app-dialog 
+[isOpen]="showFeedbackDialog"
+title="Provide Review Feedback"
+confirmText="Submit"
+(onConfirm)="submitFeedback()"
+(onCancel)="showFeedbackDialog = false">
+
+<form [formGroup]="feedbackForm" class="text-left">
+  <div class="mb-4">
+    <label class="block text-gray-700 text-sm font-bold mb-2">
+      Rating (1-5)
+    </label>
+    <input 
+      type="number" 
+      formControlName="rating"
+      min="1"
+      max="5"
+      class="w-full px-3 py-2 border rounded">
+  </div>
+  
+  <div class="mb-4">
+    <label class="block text-gray-700 text-sm font-bold mb-2">
+      Feedback
+    </label>
+    <textarea 
+      formControlName="feedback"
+      rows="4"
+      class="w-full px-3 py-2 border rounded"></textarea>
+  </div>
+</form>
+</app-dialog>
+
+
+        <!-- My Reviews Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-4">My Reviews</h2>
+            @for (review of myReviews; track review.id) {
+                <div class="border rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Period: {{review.period}}</span>
+                        <span class="px-2 py-1 text-sm rounded-full"
+                              [ngClass]="review.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                            {{review.status}}
+                        </span>
+                    </div>
+                    @if (review.rating) {
+                        <p class="mt-2">Rating: {{review.rating}}/5</p>
+                    }
+                </div>
+            } @empty {
+                <p class="text-gray-500 text-center py-4">No reviews available</p>
+            }
+        </div>
+    </div>
+</div>
