@@ -1,59 +1,76 @@
-# EmployeeFrontend
+# **Employee Review System**
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.4.
+This project was created using angular v19
+---
 
-## Development server
+## ✨ **Features**
+- **Simple UI**: Simple UI made using TailwindCSS
 
-To start a local development server, run:
+---
 
+## 🛠 **Tech Stack**
+- **Frontend**: Angular 19.0.4, SCSS, Tailwind CSS
+- **Backend**: Express.js, Node.js
+- **Database**: MongoDB 
+
+---
+
+## 🚀 **Quick Start**
+
+### **1. Clone the repository**
 ```bash
-ng serve
+git clone https://github.com/Alan13Mathew/employee-review-frontend.git
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+### **2. Install dependencies**
 ```bash
-ng generate component component-name
+cd employee-review-frontend.git
+npm i
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
+### **3 Run the development server**
 ```bash
-ng generate --help
+ng serve --open
 ```
 
-## Building
-
-To build the project run:
+## 📦 Build
+Build your application for production:
 
 ```bash
 ng build
 ```
+Artifacts will be stored in the dist/ directory.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-## Running unit tests
+## 🧪 Testing
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Unit Tests
+Run all unit tests: 
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
+### End-to-End Tests
+Run end-to-end tests:
 ```bash
 ng e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 📱 Responsive Design
 
-## Additional Resources
+- **Desktop**: Fully optimized.
+- **Tablet**: Friendly and intuitive.
+- **Mobile**: Responsive and easy to navigate.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are always welcome! To get started, fork the repository and submit a pull request.
+
+
+
