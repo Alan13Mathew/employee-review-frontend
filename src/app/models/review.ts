@@ -6,12 +6,12 @@ export interface Review {
       email: string;
       position: string;
   };
-  reviewerId: string | {
+  reviewerIds: string[] | {
       _id: string;
       full_name: string;
       email: string;
       position: string;
-  };
+  }[];
   period: string;
   status: 'pending' | 'completed';
   rating?: number;
@@ -22,7 +22,7 @@ export interface Review {
   
   export interface CreateReview {
     employeeId: string;
-    reviewerId: string;
+    reviewerIds: string[];
     period: string;
     dueDate: Date;
   }

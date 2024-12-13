@@ -42,6 +42,17 @@
         </form>
       </app-dialog>
     </div>
+    <app-dialog
+  [isOpen]="showDeleteDialog"
+  title="Confirm Delete"
+  confirmText="Delete"
+  confirmButtonClass="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+  (onConfirm)="confirmDelete()"
+  (onCancel)="showDeleteDialog = false">
+  <p>Are you sure you want to delete {{employeeToDelete?.full_name}}?</p>
+  <p class="text-sm text-gray-600 mt-2">This action cannot be undone and will remove all associated reviews.</p>
+</app-dialog>
+
 
     <table class="w-full">
         <thead>
@@ -63,7 +74,7 @@
                     <td class="px-6 py-4">
                         <button (click)="editEmployee(employee)" 
                                 class="text-blue-500 mr-2">Edit</button>
-                        <button (click)="deleteEmployee(employee._id)" 
+                        <button (click)="deleteEmployee(employee)" 
                                 class="text-red-500">Delete</button>
                     </td>
                 </tr>

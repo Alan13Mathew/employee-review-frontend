@@ -6,8 +6,7 @@ import { DialogComponent } from '../../components/dialog/dialog.component';
 @Component({
   selector: 'app-admin-dashboard',
   imports: [RouterLink,RouterOutlet,DialogComponent],
-  templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.scss'
+  templateUrl: './admin-dashboard.component.html'
 })
 export class AdminDashboardComponent {
 

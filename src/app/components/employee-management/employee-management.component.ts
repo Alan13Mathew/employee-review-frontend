@@ -8,7 +8,6 @@ import { DialogComponent } from '../dialog/dialog.component';
   selector: 'app-employee-management',
   imports: [DialogComponent,ReactiveFormsModule],
   templateUrl: './employee-management.component.html',
-  styleUrl: './employee-management.component.scss'
 })
 export class EmployeeManagementComponent implements OnInit{
 
@@ -18,6 +17,9 @@ export class EmployeeManagementComponent implements OnInit{
   showDialog = false;
   selectedEmployee: Employee | null = null;
   employeeForm: FormGroup;
+
+  showDeleteDialog = false;
+  employeeToDelete: Employee | null = null;
 
 
   constructor() { 
@@ -45,9 +47,24 @@ export class EmployeeManagementComponent implements OnInit{
     this.showDialog = true;
   }
 
-  deleteEmployee(id: string) {
-    // TODO: Add delete employee logic
-    console.log('delete employee');
+  confirmDelete() {
+    if (this.employeeToDelete) {
+      this.employeeService.deleteEmployee(this.employeeToDelete._id).subscribe({
+        next: () => {
+          this.loadEmployees();
+          this.showDeleteDialog = false;
+          this.employeeToDelete = null;
+        },
+        error: (error) => {
+          console.log('Delete error:', error);
+        }
+      });
+    }
+  }
+
+  deleteEmployee(employee: Employee) {
+    this.employeeToDelete = employee;
+    this.showDeleteDialog = true;
   }
 
   ngOnInit(): void {
