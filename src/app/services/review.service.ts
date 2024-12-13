@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { CreateReview, Review } from '../models/review';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap, throwError } from 'rxjs';
 import { Feedback } from '../models/feedback';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -17,15 +17,26 @@ export class ReviewService {
   getReviews() {
     const userRole = localStorage.getItem('userRole');
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    console.log('User Role:', userRole);
-    console.log('Current user:', currentUser);
-  
-    if (userRole === 'admin') {
-      return this.http.get<Review[]>(this.apiUrl);
-    } else {
-      return this.http.get<Review[]>(`${this.apiUrl}?userId=${currentUser.id}`);
-    }
-  }
+    const userId = currentUser.id;
+    
+    console.log('Review request details:', {
+        userId,
+        userRole,
+        userName: currentUser.full_name
+    });
+
+    // For employees, explicitly include reviews where they are reviewers
+    const params = new HttpParams()
+        .set('userId', userId)
+        .set('role', userRole || '')
+        .set('includeAssigned', 'true');  // New flag to include assigned reviews
+
+    return this.http.get<Review[]>(this.apiUrl, { params }).pipe(
+        tap(reviews => console.log('Raw reviews from server:', reviews))
+    );
+}
+
+
   
   
   
@@ -39,9 +50,10 @@ export class ReviewService {
     console.log('Creating review:', review);
     const payload = {
       employeeId: review.employeeId,
-      reviewerId: review.reviewerIds, // Currently only handles single reviewer
+      reviewerId: review.reviewerId, // Currently only handles single reviewer
       period: review.period,
-      dueDate: review.dueDate
+      dueDate: review.dueDate,
+      status: 'pending'
      }
     return this.http.post<Review>(this.apiUrl, payload);
   }

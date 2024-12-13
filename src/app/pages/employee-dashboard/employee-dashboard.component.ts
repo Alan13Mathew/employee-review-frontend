@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Review } from '../../models/review';
 import { ReviewService } from '../../services/review.service';
 import { EmployeeService } from '../../services/employee.service';
@@ -9,18 +9,25 @@ import { Employee } from '../../models/employee';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DialogComponent } from '../../components/dialog/dialog.component';
 
+
+interface PopulatedUser {
+  _id: string;
+  full_name: string;
+  email: string;
+  position: string;
+}
 @Component({
   selector: 'app-employee-dashboard',
   imports: [NgClass,DatePipe,ReactiveFormsModule,DialogComponent],
   templateUrl: './employee-dashboard.component.html',
   styleUrl: './employee-dashboard.component.scss'
 })
-export class EmployeeDashboardComponent implements OnInit{
+export class EmployeeDashboardComponent{
   pendingReviews: Review[] = [];
   myReviews: Review[] = [];
   employeeNames: Map<string, string> = new Map();
+  currentUser = this.getCurrentUser();
 
-  currentUser: Employee = JSON.parse(localStorage.getItem('currentUser') as string);
 
   private reviewService = inject(ReviewService);
   private employeeService = inject(EmployeeService);
@@ -42,58 +49,113 @@ export class EmployeeDashboardComponent implements OnInit{
       feedback: ['', [Validators.required, Validators.minLength(5)]]
     });
 
+    this.loadReviews();
+    this.loadEmployeeNames();
+    this.initializeUserAndLoadData();
+
   }
 
 
-  ngOnInit(): void {
+
+  private getCurrentUser() {
+    const userData = localStorage.getItem('currentUser');
+    return userData ? JSON.parse(userData) : {
+      _id: '',
+      full_name: '',
+      email: '',
+      position: ''
+    };
+  }
+
+
+
+  loadReviews() {
+    const userId = this.currentUser.id;
+    
+    this.reviewService.getReviews().subscribe({
+      next: (reviews) => {
+        this.pendingReviews = reviews.filter(review => {
+          const reviewerId = typeof review.reviewerId === 'string' 
+            ? review.reviewerId 
+            : (review.reviewerId as PopulatedUser)._id;
+          return reviewerId === userId && review.status === 'pending';
+        });
+        
+        this.myReviews = reviews.filter(review => {
+          const employeeId = typeof review.employeeId === 'string' 
+            ? review.employeeId 
+            : (review.employeeId as PopulatedUser)._id;
+          return employeeId === userId;
+        });
+      }
+    });
+  }
+  
+  
+  
+  
+  
+  private processReviews(reviews: Review[]) {
+    this.pendingReviews = reviews.filter(r => 
+      r.reviewerId === this.currentUser._id && 
+      r.status === 'pending'
+    );
+    this.myReviews = reviews.filter(r => 
+      r.employeeId === this.currentUser._id
+    );
+  }
+
+
+  private initializeUserAndLoadData() {
+    // First ensure user data is loaded
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      this.currentUser = JSON.parse(userData);
+      console.log('User loaded successfully:', this.currentUser);
       this.loadReviews();
       this.loadEmployeeNames();
+    } else {
+      // Redirect to login if no user data
+      this.router.navigate(['/login']);
+    }
   }
+  
 
-  loadReviews(){
-  const currentUserId = this.currentUser._id;
-    this.reviewService.getReviews().subscribe(reviews => {   
-      //filter reviews by current user
-      this.pendingReviews = reviews.filter(r=>r.reviewerId === currentUserId && r.status === 'pending');
-      this.myReviews = reviews.filter(r=>r.employeeId === currentUserId );
+  loadEmployeeNames() {
+    this.employeeService.getEmployees().subscribe({
+      next: (employees) => {
+        this.employeeNames.clear();
+        employees.forEach(employee => {
+          this.employeeNames.set(employee._id, employee.full_name);
+        });
+      },
+      error: (error) => console.error('Error loading employee names:', error)
     });
   }
 
-  loadEmployeeNames(){
-    this.employeeService.getEmployees().subscribe(employees => {
-      employees.forEach(employee => {
-        this.employeeNames.set(employee._id, employee.full_name);
-      });
-    });
-  }
-
-  getEmployeeName(employeeId: string){
-    return this.employeeNames.get(employeeId);
+  getEmployeeName(employee: any): string {
+    return employee?.full_name || 'Unknown Employee';
   }
 
   provideFeedback(review: Review) {
-    // TODO: Add provide feedback logic
-    this.showFeedbackDialog = true;
     this.selectedReview = review;
+    this.showFeedbackDialog = true;
   }
 
   submitFeedback() {
     if (this.feedbackForm.valid && this.selectedReview) {
       this.reviewService.submitFeedback(
-        this.selectedReview.id,
+        this.selectedReview._id,
         this.feedbackForm.value
       ).subscribe({
-        next: ()=>{
+        next: () => {
+          this.loadReviews();
           this.showFeedbackDialog = false;
           this.feedbackForm.reset();
           this.selectedReview = null;
         },
-        error: (err)=>{
-          console.log('Error submitting feedback', err);
-        }
-      })
-      this.showFeedbackDialog = false;
-      this.feedbackForm.reset();
+        error: (error) => console.error('Error submitting feedback:', error)
+      });
     }
   }
 

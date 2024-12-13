@@ -25,7 +25,7 @@
         <!-- Pending Reviews Section -->
         <div class="bg-white rounded-lg shadow p-6">
             <h2 class="text-2xl font-bold mb-4">Pending Reviews</h2>
-            @for (review of pendingReviews; track review.id) {
+            @for (review of pendingReviews; track review._id) {
                 <div class="border rounded-lg p-4 mb-4">
                     <div class="flex justify-between items-center">
                         <h3 class="font-semibold">Review for: {{getEmployeeName(review.employeeId)}}</h3>
@@ -51,50 +51,70 @@ confirmText="Submit"
 (onCancel)="showFeedbackDialog = false">
 
 <form [formGroup]="feedbackForm" class="text-left">
-  <div class="mb-4">
-    <label class="block text-gray-700 text-sm font-bold mb-2">
+    <div class="mb-4">
+     <label class="block text-gray-700 text-sm font-bold mb-2">
       Rating (1-5)
-    </label>
-    <input 
+     </label>
+     <input 
       type="number" 
       formControlName="rating"
       min="1"
       max="5"
       class="w-full px-3 py-2 border rounded">
-  </div>
+     </div>
   
-  <div class="mb-4">
-    <label class="block text-gray-700 text-sm font-bold mb-2">
-      Feedback
-    </label>
-    <textarea 
+     <div class="mb-4">
+     <label class="block text-gray-700 text-sm font-bold mb-2">
+       Feedback
+     </label>
+     <textarea 
       formControlName="feedback"
       rows="4"
       class="w-full px-3 py-2 border rounded"></textarea>
-  </div>
-</form>
-</app-dialog>
+     </div>
+        </form>
+        </app-dialog>
 
 
         <!-- My Reviews Section -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-2xl font-bold mb-4">My Reviews</h2>
-            @for (review of myReviews; track review.id) {
-                <div class="border rounded-lg p-4 mb-4">
-                    <div class="flex justify-between items-center">
-                        <span class="font-semibold">Period: {{review.period}}</span>
-                        <span class="px-2 py-1 text-sm rounded-full"
-                              [ngClass]="review.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
-                            {{review.status}}
-                        </span>
+<!-- My Reviews Section -->
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-bold mb-4">My Reviews</h2>
+    @for (review of myReviews; track review._id) {
+        <div class="border rounded-lg p-4 mb-4">
+            <div class="flex justify-between items-center mb-3">
+                <span class="font-semibold">Period: {{review.period}}</span>
+                <span class="px-2 py-1 text-sm rounded-full"
+                      [ngClass]="review.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                    {{review.status}}
+                </span>
+            </div>
+            
+
+            <!-- Feedback Section -->
+            @if (review.status === 'completed') {
+                <div class="mt-4 bg-gray-50 p-4 rounded">
+                    <div class="flex items-center mb-2">
+                        <span class="font-medium">Rating:</span>
+                        <span class="ml-2 text-blue-600">{{review.rating}}/5</span>
                     </div>
-                    @if (review.rating) {
-                        <p class="mt-2">Rating: {{review.rating}}/5</p>
+                    @if (review.feedback) {
+                        <div>
+                            <span class="font-medium">Feedback:</span>
+                            <p class="mt-1 text-gray-700">{{review.feedback}}</p>
+                        </div>
                     }
                 </div>
-            } @empty {
-                <p class="text-gray-500 text-center py-4">No reviews available</p>
+            } @else {
+                <div class="text-sm text-gray-500 italic">
+                    Feedback pending from reviewer
+                </div>
             }
         </div>
+    } @empty {
+        <p class="text-gray-500 text-center py-4">No reviews available</p>
+    }
+    </div>
+
     </div>
 </div>
